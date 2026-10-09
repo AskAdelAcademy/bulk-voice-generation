@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bulk Voice Generation"
+  short_description: "Prepare and narrate lesson sections with TopMediai"
+  default_prompt: "Use $bulk-voice-generation to prepare my lesson and generate one narration file per section with TopMediai."

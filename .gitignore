@@ -1,0 +1,10 @@
+.env
+.env.*
+*.local.json
+secrets/
+credentials/
+outputs/
+__pycache__/
+*.pyc
+*.part
+*.dpapi

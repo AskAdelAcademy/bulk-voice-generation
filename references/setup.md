@@ -20,7 +20,7 @@ For later lessons, attach the lesson and ask Codex to make narration using your 
 
 The window opens when you first ask Codex to set up or use the skill, rather than merely when its files are installed. You can also say **“Set up Bulk Voice Generation”** immediately after installation. If setup is already complete, Codex reuses it and skips the window. If your computer prevents Codex from opening it, double-clicking `Voice Setup.vbs` is a fallback.
 
-**Preview limitation:** setup can check the account and save a voice. Real narration and listening samples are not available until the TopMediai audio integration is completed. You can ask Codex to prepare the six-section example without an account or key.
+The setup window saves your account and voice; Codex generates the actual narration afterward. You can also ask Codex to prepare the six-section example without an account or key.
 
 The launcher needs an available Python with Tkinter; it tries the Windows Python launcher and the known bundled Codex runtime location. No installation or download is performed. If Windows blocks VBS or the window does not appear, ask Codex to launch `scripts/voice_setup.py` directly using an available Python. The runtime path is not guaranteed on every Codex installation. This graphical setup currently supports Windows only.
 
@@ -75,4 +75,17 @@ python scripts/bulk_voice.py voices --query English
 
 The check calls the documented account endpoint and prints only status and remaining count. Numeric status meanings are not documented; the helper does not label a number “active.” Generation must ultimately be confirmed by a short real sample. Voice listing prints names, languages, and speaker IDs. Use a listed ID in `prepare --speaker ... --voice-name ...`. Add `--emotion ...` only for a voice confirmed to support that emotion. A missing key gives friendly setup guidance; API errors never dump raw responses.
 
-Live speech and test-sample synthesis are blocked pending the response contract described in [integration status](topmediai-api.md). No purchase or key is needed for offline preparation/tests.
+Live speech uses the response verified in [integration status](topmediai-api.md). No purchase or key is needed for offline preparation/tests.
+
+## Audio decoder (Codex handles this)
+
+TopMediai may return MP3 content under a WAV filename. The helper requires FFmpeg to decode it into valid PCM WAV. If FFmpeg is already on PATH, reuse it. Otherwise Codex can install imageio-ffmpeg. Students do not need to run these commands themselves.
+
+On Windows, using the selected Python executable and the actual user's environment:
+
+```powershell
+$voiceRuntime = Join-Path $env:LOCALAPPDATA 'BulkVoiceGeneration\runtime'
+python -m pip install --target $voiceRuntime imageio-ffmpeg
+```
+
+On other platforms install imageio-ffmpeg into the Python environment used by the helpers, or use an existing FFmpeg. This package includes the decoder; do not put its binaries in the published skill repository. Check decoder_path() before synthesis. Use the host permission flow if sandboxing hides the user's local settings/runtime; do not ask the student to re-enter credentials that are already saved.

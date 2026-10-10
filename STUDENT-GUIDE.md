@@ -2,7 +2,7 @@
 
 You can use ordinary messages in Codex. You do not need PowerShell, programming, or special file formats.
 
-**Current preview:** Codex can prepare your lesson for narration, connect your TopMediai account, and save your voice choice. Creating audio and playing a voice sample are not available yet. You can try lesson preparation without a key or payment.
+Codex can prepare your lesson, connect your TopMediai account, and generate one WAV narration file per section. Local preparation needs no API credits. Real narration and samples use your TopMediai credits.
 
 ## 1. Start after installation
 
@@ -40,7 +40,7 @@ The setup window saves the key encrypted for your Windows account, outside lesso
 
 > My voice is set up. What is the next step?
 
-Codex verifies the saved settings. You will not need to repeat this for every lesson. This preview does not offer a listening sample yet.
+Codex verifies the saved settings. You will not need to repeat this for every lesson. Ask Codex for a short listening sample after saving your voice.
 
 ## 4. Give Codex your lesson
 
@@ -70,11 +70,11 @@ Or:
 
 > Keep that technical term exactly as written, and explain how it will be pronounced.
 
-**This is where the current preview stops. No audio files have been generated.**
+Preparation does not create audio yet. When the text is ready, continue to the voice sample or full narration.
 
-## 6. Generate and listen once audio generation is available
+## 6. Generate and listen
 
-After the integration is completed and tested, the intended next steps are:
+To check the voice first, say:
 
 > Make a short voice sample from the first section.
 

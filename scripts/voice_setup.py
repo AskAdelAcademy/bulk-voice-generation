@@ -36,7 +36,7 @@ class SetupWindow:
         frame.pack(fill="both", expand=True)
         ttk.Label(frame, text="Set up your lesson voice", font=("Segoe UI", 19, "bold")).pack(anchor="w")
         ttk.Label(frame, text="Connect your TopMediai account, then choose a voice. No commands needed.", wraplength=650).pack(anchor="w", pady=(8, 14))
-        ttk.Label(frame, text="Preview version: account setup works here. Audio generation is not available yet.", wraplength=650).pack(anchor="w", pady=(0, 18))
+        ttk.Label(frame, text="Save your account and voice here, then return to Codex to generate narration.", wraplength=650).pack(anchor="w", pady=(0, 18))
         ttk.Button(frame, text="1. Open TopMediai to get my key", command=lambda: webbrowser.open("https://www.topmediai.com/api/text-to-speech-api/")).pack(anchor="w")
         activation_note = tk.Frame(frame, background="#FFF3CD", highlightbackground="#B77900", highlightthickness=2, padx=12, pady=10)
         activation_note.pack(fill="x", pady=(10, 0))
@@ -207,7 +207,7 @@ class SetupWindow:
             self.status.set("The voice could not be saved. Check your local storage permissions.")
             return
         self.selected.set("Saved voice: " + voice["name"])
-        self.status.set("Voice saved successfully. You can close this window and return to Codex. Audio generation is still unavailable in this preview.")
+        self.status.set("Voice saved successfully. You can close this window and return to Codex. Your settings will be reused for your next lesson.")
         messagebox.showinfo("Voice saved", f"Your voice choice, {voice['name']}, has been saved.\n\nThis window does not need to stay open. Return to Codex and say: My voice is set up.", parent=self.root)
         if close_after:
             self.root.destroy()

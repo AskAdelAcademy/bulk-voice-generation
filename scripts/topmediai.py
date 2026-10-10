@@ -4,6 +4,8 @@ import os
 import urllib.error
 import urllib.request
 from local_settings import load_saved_key, SettingsError
+from urllib.parse import urlsplit
+from audio_codec import decoder_path, normalize_wav
 
 
 class VoiceError(Exception):
@@ -95,8 +97,44 @@ class TopMediai:
         return safe
 
     def ensure_synthesis_ready(self):
-        raise VoiceError("Live synthesis is not enabled: the official TTS success-response schema and audio format are unconfirmed. See references/topmediai-api.md. No speech request was sent.")
+        if not decoder_path():
+            raise VoiceError("Audio setup needs a decoder. Ask Codex to install imageio-ffmpeg using references/setup.md. No speech request was sent.")
+        if not self.key:
+            raise VoiceError("Open Voice Setup to connect your TopMediai account first.")
 
     def synthesize_wav(self, text, speaker, emotion=None):
-        payload(text, speaker, emotion)
         self.ensure_synthesis_ready()
+        request = urllib.request.Request("https://api.topmediai.com/v1/text2speech",
+            data=json.dumps(payload(text, speaker, emotion)).encode("utf-8"),
+            headers={"x-api-key": self.key, "Content-Type": "application/json", "Accept": "application/json"})
+        try:
+            with urllib.request.build_opener(NoRedirect).open(request, timeout=120) as response:
+                raw = response.read(2_000_001)
+            if len(raw) > 2_000_000:
+                raise ValueError()
+            result = json.loads(raw)
+            # Observed on the official API in the authorized 2026-10-09 live test.
+            if not isinstance(result, dict) or result.get("status") != 200:
+                raise ValueError()
+            url = result["data"]["oss_url"]
+            return self.download_audio(url)
+        except urllib.error.HTTPError as exc:
+            if exc.code in (400, 401, 403, 422, 429):
+                raise GenerationRejected(f"TopMediai rejected the request (HTTP {exc.code}). Check your key, credits, voice, or request limit.") from None
+            raise UncertainGeneration("Speech request outcome is uncertain. Do not resend automatically.") from None
+        except Exception:
+            raise UncertainGeneration("Speech or audio download did not finish. It may have consumed credits; do not resend automatically.") from None
+
+    def download_audio(self, url):
+        parsed = urlsplit(url)
+        if parsed.scheme != "https" or parsed.hostname != "files.topmediai.com" or parsed.port not in (None, 443) or parsed.username or parsed.password:
+            raise VoiceError("Unrecognized audio download host. Review the provider response before proceeding.")
+        # Never send authentication headers to storage; do not follow redirects.
+        try:
+            with urllib.request.build_opener(NoRedirect).open(url, timeout=90) as response:
+                data = response.read(25_000_001)
+            if len(data) > 25_000_000:
+                raise ValueError()
+            return normalize_wav(data)
+        except Exception:
+            raise UncertainGeneration("Generated audio could not be downloaded or decoded; a new request may charge again.") from None

@@ -136,8 +136,8 @@ class WorkflowTests(unittest.TestCase):
 
     def test_generation_blocked_before_network(self):
         self.prepare()
-        with patch.object(TopMediai, "get", side_effect=AssertionError("Unexpected network call")):
-            with self.assertRaisesRegex(VoiceError, "not enabled"):
+        with patch("topmediai.decoder_path", return_value=None), patch.object(TopMediai, "get", side_effect=AssertionError("Unexpected network call")):
+            with self.assertRaisesRegex(VoiceError, "decoder"):
                 bulk.generate(self.out, TopMediai())
 
     def test_payload_and_invalid_audio(self):

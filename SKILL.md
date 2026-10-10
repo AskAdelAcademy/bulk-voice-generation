@@ -5,11 +5,11 @@ description: Prepare educational lessons for natural narration and generate sepa
 
 # Bulk Voice Generation
 
-Read [the integration status](references/topmediai-api.md) before making API calls. Live synthesis is currently blocked because the official documentation does not define the successful TTS response or audio formats. Do not invent response fields or silently substitute a provider. Preparation, connection checks, voice listing, and offline tests work independently.
+Read [the integration status](references/topmediai-api.md) before making API calls. Live synthesis supports the response observed from TopMediai on 2026-10-09. Ensure the audio decoder is installed before making paid requests; see setup below. Do not invent support for other response variants or silently substitute a provider.
 
 ## Guide first-time students
 
-Use [the student guide](STUDENT-GUIDE.md) when a student asks how to start after installation, requests setup, or first requests narration with incomplete configuration. Give a brief overview, then guide one step at a time. Do not send the technical reference or a list of shell commands as the default instructions. Explain that the current preview can prepare lessons and configure an account but cannot yet create audio, before asking the student to obtain a key or spend money.
+Use [the student guide](STUDENT-GUIDE.md) when a student asks how to start after installation, requests setup, or first requests narration with incomplete configuration. Give a brief overview, then guide one step at a time. Do not send the technical reference or shell commands as the default instructions. Explain that real speech requests use TopMediai credits; local preparation is free of API charges.
 
 For a setup request, check existing configuration first. Open the private setup window when needed and describe the next button or field the student should use. Wait for the student's completion or error report before moving to a dependent step; continue independent local preparation when useful. Never request the key in chat. Once setup is confirmed, explain how to attach or paste a lesson, choose an output folder in plain language, and use their saved voice. Offer the included six-section preparation example if they have no lesson ready.
 
@@ -37,7 +37,9 @@ On Windows, if setup is missing, open `scripts/voice_setup.py` using an availabl
 
 Resolve the setup script relative to this installed SKILL.md, never to an author's drive or username. Verify the chosen runtime can import Tkinter before launching. Respect host execution, network, and local-settings access permissions; if the host blocks launch or saving, explain the actual restriction and use its approval flow where available. Do not report that the window opened merely because a process was started: check that the process remains running, and let the student confirm visibility without inspecting the private key field. If a window cannot be launched, offer the double-click method as a fallback, not the default onboarding.
 
-Use the saved voice unless the user asks to change it. `prepare` automatically loads the saved voice when no `--speaker` argument is supplied. Ask about language/style if it helps narrow their choice, then present names, not IDs. Do not fabricate audio previews: this version's setup has no working speech audition.
+Use the saved voice unless the user asks to change it. `prepare` automatically loads the saved voice when no `--speaker` argument is supplied. Ask about language/style if it helps narrow their choice, then present names, not IDs. The setup window has no audition button: generate an optional short sample through the helper in a separate output folder and present the real audio file.
+
+Check `audio_codec.decoder_path()` before synthesis. If missing, install imageio-ffmpeg as described in [setup](references/setup.md), using available permissions. This is a small local runtime dependency, not a key or model change. On Windows install it into the per-user runtime folder rather than the skill repository. Never ask beginners to run these commands themselves. If execution is sandboxed and cannot see encrypted settings or the runtime in the user's profile, use the host's permission flow rather than concluding that the user has no key or asking them to re-enter it.
 
 Run `python scripts/bulk_voice.py check` before a batch. Account responses contain the key itself; the helper emits only selected nonsecret fields. Run `voices --query English` (or the lesson language), offer a few matching voices from the actual list, and save the chosen speaker ID/name in the manifest. Do not silently pick a voice. Use the same speaker and optional emotion throughout unless asked otherwise. Do not invent speed or pitch API parameters.
 
@@ -51,8 +53,8 @@ python scripts/bulk_voice.py generate outputs/my-lesson --dry-run
 python scripts/bulk_voice.py generate outputs/my-lesson
 ```
 
-Before synthesis, report section count, characters, request count, and output folder. Once the verified adapter is available, offer an optional short sample using a separately prepared one-section lesson/output folder. Samples consume credits too. Do not require sample approval if the user already chose a voice and asked for full generation.
+Before synthesis, report section count, characters, request count, and output folder. Offer an optional short sample using a separately prepared one-section lesson/output folder. Samples consume credits too. Do not require sample approval if the user already chose a voice and asked for full generation.
 
-Live generation currently stops before any synthesis charge. Explain the exact documentation gap and preserve all prepared work. See the API reference for the bounded completion procedure; never claim mock audio is generated speech.
+The helper decodes provider audio into valid PCM WAV regardless of the URL extension, and joins long sections into one WAV per section. Unknown responses or download/decoding failures are treated as uncertain, preserving prior outputs. Never claim mock audio is generated speech. Present real output links and encourage the user to listen for pronunciation and joins.
 
 The runner handles one section at a time, checkpoints each chunk, preserves completed audio, and records errors. Re-running resumes pending/failed work. `--section 3` selects the third section by position. Uncertain POST outcomes require `--retry-uncertain` after explaining potential duplicate charges and getting authorization for that retry. Never automatically replay a timed-out synthesis request. Use a new output folder when changing transcripts or voice settings. Do not publish or push lesson data, credentials, or the skill unless separately requested.
